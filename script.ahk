@@ -193,7 +193,11 @@ StoreOrGoToWindow(index)
   handle := "ahk_id " windows[index]
 
   if (WinActive(handle))
-    windows.Delete(index)
+  {
+    Msgbox, 260, , "Stop tracking window?"
+    IfMsgBox, Yes
+      windows.Delete(index)
+  }
   else if (WinExist(handle))
     WinActivate, %handle%
   else
