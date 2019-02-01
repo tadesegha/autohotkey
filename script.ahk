@@ -7,6 +7,7 @@
 #NoTrayIcon
 
 mode := "normal"
+windows := { }
 
 #1:: Reload
 #0:: ExitApp
@@ -24,7 +25,7 @@ RShift::
   if InRemoteDesktop()
     Return
 
-  NormalMode()
+  NavigateMode()
 Return
 
 Capslock::
@@ -34,17 +35,11 @@ Capslock::
   Send {Esc}
 Return
 
-ProcessNavigate()
+ProcessNavigationCommands()
 {
   UserInput := GetUserInput()
 
-  if (UserInput == "c" || UserInput == "e")
-    SwitchToProgram("Neovim", "powershell.exe -WindowStyle Hidden -command e")
-  else if (UserInput == "i")
-    SwitchToProgram("ahk_class Chrome_WidgetWin_1", "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe")
-  else if (UserInput == "o")
-    SwitchToProgram("ahk_class rctrl_renwnd32", "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Outlook 2016.lnk")
-  else if (UserInput == "j")
+  if (UserInput == "j")
     Send {down}
   else if (UserInput == "/")
     Send +{F10} ; right click
@@ -83,6 +78,8 @@ ProcessNavigate()
     Send {PgUp}
   else if (UserInput == "J")
     Send {PgDn}
+  else if UserInput in 1,2,3,4,5,6
+    StoreOrGoToWindow(UserInput)
   else
     UnrecognizedInput(UserInput)
 }
@@ -153,7 +150,7 @@ NavigateMode()
   GoIntoNavigateMode()
 
   while (InNavigateMode())
-    ProcessNavigate()
+    ProcessNavigationCommands()
 }
 
 GoIntoNavigateMode()
@@ -187,4 +184,20 @@ SwitchToProgram(identity, location)
 InRemoteDesktop()
 {
   Return WinActive("ahk_class TscShellContainerClass")
+}
+
+StoreOrGoToWindow(index)
+{
+  global windows
+
+  handle := "ahk_id " windows[index]
+
+  if (WinActive(handle))
+    windows.Delete(index)
+  else if (WinExist(handle))
+    WinActivate, %handle%
+  else
+    windows[(index)] := WinExist("A")
+
+  NormalMode()
 }
