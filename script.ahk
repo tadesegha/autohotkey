@@ -17,15 +17,7 @@ LShift::
   if InRemoteDesktop()
     Return
 
-  NavigateMode()
-Return
-
-RShift & F1:: return
-RShift::
-  if InRemoteDesktop()
-    Return
-
-  NavigateMode()
+  VimNavigationMode()
 Return
 
 Capslock::
@@ -78,8 +70,6 @@ ProcessNavigationCommands()
     Send {PgUp}
   else if (UserInput == "J")
     Send {PgDn}
-  else if UserInput in 1,2,3,4,5,6
-    StoreOrGoToWindow(UserInput)
   else
     UnrecognizedInput(UserInput)
 }
@@ -101,7 +91,7 @@ ProcessVisual()
   else if (UserInput == "b")
     Send ^+{left}
   else if (UserInput == "v")
-    NavigateMode()
+    VimNavigationMode()
   else if (UserInput == "0")
     Send +{Home}
   else if (UserInput == "$")
@@ -145,21 +135,21 @@ InVisualMode()
   Return mode == "visual"
 }
 
-NavigateMode()
+VimNavigationMode()
 {
-  GoIntoNavigateMode()
+  GoIntoVimNavigationMode()
 
-  while (InNavigateMode())
+  while (InVimNavigationMode())
     ProcessNavigationCommands()
 }
 
-GoIntoNavigateMode()
+GoIntoVimNavigationMode()
 {
   global mode
   mode := "navigate"
 }
 
-InNavigateMode()
+InVimNavigationMode()
 {
   global mode
   Return mode == "navigate"
@@ -184,6 +174,20 @@ SwitchToProgram(identity, location)
 InRemoteDesktop()
 {
   Return WinActive("ahk_class TscShellContainerClass")
+}
+
+RShift & F1:: return
+RShift::
+  if InRemoteDesktop()
+    Return
+
+  ProcessWindowNavigationCommand()
+Return
+
+ProcessWindowNavigationCommand()
+{
+  UserInput := GetUserInput()
+  StoreOrGoToWindow(UserInput)
 }
 
 StoreOrGoToWindow(index)
