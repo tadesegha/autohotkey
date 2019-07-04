@@ -187,7 +187,11 @@ Return
 ProcessWindowNavigationCommand()
 {
   UserInput := GetUserInput()
-  StoreOrGoToWindow(UserInput)
+
+  if Trim(UserInput) = ""
+    NormalMode()
+  else
+    StoreOrGoToWindow(UserInput)
 }
 
 StoreOrGoToWindow(index)
